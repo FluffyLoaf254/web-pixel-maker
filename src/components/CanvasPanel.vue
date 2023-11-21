@@ -21,9 +21,12 @@ const convertPixelsToRem = (pixels: number): number => {
 
 const panel = ref<HTMLDivElement | null>(null);
 
+const panelWidth = ref(0);
+const panelHeight = ref(0);
+
 const position = computed<Position>(() => ({
-  x: convertPixelsToRem(((panel.value?.offsetWidth ?? 0) + width.value * scaleMultiplier.value) / 2),
-  y: convertPixelsToRem(((panel.value?.offsetHeight ?? 0) + height.value * scaleMultiplier.value) / 2),
+  x: convertPixelsToRem((panelWidth.value + width.value * scaleMultiplier.value) / 2),
+  y: convertPixelsToRem((panelHeight.value + height.value * scaleMultiplier.value) / 2),
 }));
 
 const width = ref(128);
@@ -39,8 +42,8 @@ const setPanelScroll = () => {
 
 watch(scale, () => nextTick(() => setPanelScroll()));
 
-const panelWidth = computed(() => convertPixelsToRem(width.value * scaleMultiplier.value));
-const panelHeight = computed(() => convertPixelsToRem(height.value * scaleMultiplier.value));
+const panelExtraWidth = computed(() => convertPixelsToRem(width.value * scaleMultiplier.value));
+const panelExtraHeight = computed(() => convertPixelsToRem(height.value * scaleMultiplier.value));
 
 const scrollTarget = ref<Position>({
   x: 0,
@@ -67,6 +70,8 @@ const reset = () => {
     if (!panel.value) {
       return;
     }
+    panelWidth.value = panel.value.offsetWidth;
+    panelHeight.value = panel.value.offsetHeight;
     panel.value.scrollLeft = (panel.value.scrollWidth - panel.value.clientWidth) / 2;
     panel.value.scrollTop = (panel.value.scrollHeight - panel.value.clientHeight) / 2;
   });
@@ -93,7 +98,7 @@ const canvas = ref<typeof PixelCanvas | null>(null);
 
 <template>
   <div class="relative overflow-scroll w-full h-full bg-gradient-to-tr from-sky-500 to-teal-500" ref="panel" @scroll.passive="scroll" @mouseleave.stop="canvas?.endDraw" @mouseup.stop="canvas?.endDraw">
-    <div class="relative" :style="{ width: 'calc(100vw + ' + panelWidth + 'rem)', height: 'calc(100% + ' + panelHeight + 'rem)' }" @wheel.prevent="zoom" style="background-size: 3rem 3rem; background-image: conic-gradient(at 1rem 1rem, transparent 75%, rgba(255, 255, 255, 0.5) 75%);">
+    <div class="relative" :style="{ width: 'calc(100% + ' + panelExtraWidth + 'rem)', height: 'calc(100% + ' + panelExtraHeight + 'rem)' }" @wheel.prevent="zoom" style="background-size: 3rem 3rem; background-image: conic-gradient(at 1rem 1rem, transparent 75%, rgba(255, 255, 255, 0.5) 75%);">
       <pixel-canvas ref="canvas" :style="{ left: position.x + 'rem', top: position.y + 'rem' }" :scale="scaleMultiplier" :width="width" :height="height" />
     </div>
   </div>

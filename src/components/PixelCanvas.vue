@@ -31,45 +31,49 @@ watch(() => paletteStore.currentColor, (value) => {
     return;
   }
 
-  document?.setColor(value)
+  doc?.setColor(value)
 });
 
-let document: WebPixelDocument | null = null;
+let doc: WebPixelDocument | null = null;
 
 const handleMouseMove = (event: MouseEvent) => {
-  document?.setPosition(event.offsetX / (canvasSize.value.width * props.scale), event.offsetY / (canvasSize.value.height * props.scale));
+  doc?.setPosition(event.offsetX / (canvasSize.value.width * props.scale), event.offsetY / (canvasSize.value.height * props.scale));
 };
 
 const handleMouseEnter = (event: MouseEvent) => {
-  document?.clearPositions();
+  doc?.clearPositions();
   handleMouseMove(event);
 }
 
 const render = () => {
-  document?.render();
+  doc?.render();
   requestAnimationFrame(() => render());
 }
 
 onMounted(async () => {
   if (canvas.value) {
-    document = new WebPixelDocument(canvas.value, {
+    doc = new WebPixelDocument(canvas.value, {
       width: canvasSize.value.width,
       height: canvasSize.value.height
     });
-    await document.setup();
+    await doc.setup();
     render();
   }
 });
 
 const startDraw = (event: MouseEvent) => {
-  document?.startDraw();
+  doc?.startDraw();
   handleMouseMove(event);
 }
 
 const endDraw = (event: MouseEvent) => {
   handleMouseMove(event);
-  document?.endDraw();
+  doc?.endDraw();
 }
+
+const convertPixelsToRem = (pixels: number): number => {
+  return pixels / parseFloat(getComputedStyle(document.documentElement).fontSize);
+};
 
 defineExpose({
   endDraw,
@@ -78,8 +82,8 @@ defineExpose({
 </script>
 
 <template>
-  <div class="absolute bg-white shadow-sm" :style="{ 'margin-top': -(canvasSize.width * scale / 2) + 'px', 'margin-left': -(canvasSize.height * scale / 2) + 'px' }">
-    <canvas class="canvas cursor-none" :width="canvasSize.width" :height="canvasSize.height" :style="{ width: canvasSize.width * scale + 'px', height: canvasSize.height * scale + 'px' }" @mousemove.stop="handleMouseMove" @mousedown.left.stop="startDraw" @mouseup.stop="endDraw" @mouseleave.stop="handleMouseMove" @mouseenter.stop="handleMouseEnter" ref="canvas"></canvas>
+  <div class="absolute bg-white shadow-sm" :style="{ 'margin-top': convertPixelsToRem(-canvasSize.width * scale / 2) + 'rem', 'margin-left': convertPixelsToRem(-canvasSize.height * scale / 2) + 'rem' }">
+    <canvas class="canvas cursor-none" :width="canvasSize.width" :height="canvasSize.height" :style="{ width: convertPixelsToRem(canvasSize.width * scale) + 'rem', height: convertPixelsToRem(canvasSize.height * scale) + 'rem' }" @mousemove.stop="handleMouseMove" @mousedown.left.stop="startDraw" @mouseup.stop="endDraw" @mouseleave.stop="handleMouseMove" @mouseenter.stop="handleMouseEnter" ref="canvas"></canvas>
   </div>
 </template>
 
