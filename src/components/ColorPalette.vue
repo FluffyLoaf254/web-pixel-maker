@@ -18,7 +18,7 @@ const colorStyle = (color?: Color) => {
 </script>
 
 <template>
-  <div class="absolute left-4 top-4 bg-slate-100 p-4 rounded-lg z-10 shadow-lg">
+  <div class="absolute left-4 top-4 bg-slate-100 dark:bg-slate-700 p-4 rounded-lg z-10 shadow-lg">
     <div class="grid grid-cols-8 gap-1">
       <button v-for="index in 256" class="w-4 h-4 border border-slate-300 hover:border-black focus:outline-none focus:ring ring-blue-500" :class="{ ring: store.current == (index - 1) }" :style="colorStyle(store.colorByIndex(index - 1))" @click="store.selectColorByIndex(index - 1)"></button>
     </div>

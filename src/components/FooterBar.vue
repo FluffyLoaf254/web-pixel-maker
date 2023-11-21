@@ -11,7 +11,7 @@ const { zoom } = storeToRefs(store);
 </script>
 
 <template>
-  <div class="bg-white py-4 px-4 md:px-8 w-full flex justify-end gap-4 items-center">
+  <div class="bg-white py-4 px-4 md:px-8 w-full flex justify-end gap-4 items-center dark:bg-slate-700">
     <icon-button @click="store.decreaseZoom" data-tutorial="Decrease the zoom level of the document." label="Zoom Out">
       <magnifying-glass-minus-icon class="w-5 h-5" />
     </icon-button>

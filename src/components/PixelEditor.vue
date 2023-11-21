@@ -14,9 +14,9 @@ const showTutorial = () => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 h-full w-full">
+  <div class="flex flex-col h-full w-full divide-y divide-white dark:divide-black">
     <header-bar @tutorial="showTutorial">WebPixelMaker</header-bar>
-    <div class="relative flex min-h-0">
+    <div class="relative grow flex w-full h-full">
       <color-palette />
       <canvas-panel />
     </div>
