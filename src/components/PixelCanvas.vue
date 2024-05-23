@@ -36,13 +36,13 @@ watch(() => paletteStore.currentColor, (value) => {
 
 let doc: WebPixelDocument | null = null;
 
-const handleMouseMove = (event: MouseEvent) => {
+const handlePointerMove = (event: PointerEvent) => {
   doc?.setPosition(event.offsetX / (canvasSize.value.width * props.scale), event.offsetY / (canvasSize.value.height * props.scale));
 };
 
-const handleMouseEnter = (event: MouseEvent) => {
+const handlePointerEnter = (event: PointerEvent) => {
   doc?.clearPositions();
-  handleMouseMove(event);
+  handlePointerMove(event);
 }
 
 const render = () => {
@@ -61,13 +61,13 @@ onMounted(async () => {
   }
 });
 
-const startDraw = (event: MouseEvent) => {
+const startDraw = (event: PointerEvent) => {
   doc?.startDraw();
-  handleMouseMove(event);
+  handlePointerMove(event);
 }
 
-const endDraw = (event: MouseEvent) => {
-  handleMouseMove(event);
+const endDraw = (event: PointerEvent) => {
+  handlePointerMove(event);
   doc?.endDraw();
 }
 
@@ -77,13 +77,13 @@ const convertPixelsToRem = (pixels: number): number => {
 
 defineExpose({
   endDraw,
-  handleMouseMove,
+  handlePointerMove,
 });
 </script>
 
 <template>
   <div class="absolute bg-white shadow-sm" :style="{ 'margin-top': convertPixelsToRem(-canvasSize.width * scale / 2) + 'rem', 'margin-left': convertPixelsToRem(-canvasSize.height * scale / 2) + 'rem' }">
-    <canvas class="canvas cursor-none" :width="canvasSize.width" :height="canvasSize.height" :style="{ width: convertPixelsToRem(canvasSize.width * scale) + 'rem', height: convertPixelsToRem(canvasSize.height * scale) + 'rem' }" @mousemove.stop="handleMouseMove" @mousedown.left.stop="startDraw" @mouseup.stop="endDraw" @mouseleave.stop="handleMouseMove" @mouseenter.stop="handleMouseEnter" ref="canvas"></canvas>
+    <canvas class="canvas cursor-none" :width="canvasSize.width" :height="canvasSize.height" :style="{ width: convertPixelsToRem(canvasSize.width * scale) + 'rem', height: convertPixelsToRem(canvasSize.height * scale) + 'rem' }" @pointermove.stop="handlePointerMove" @pointerdown.left.stop="startDraw" @pointerup.stop="endDraw" @pointerleave.stop="handlePointerMove" @pointerenter.stop="handlePointerEnter" ref="canvas"></canvas>
   </div>
 </template>
 

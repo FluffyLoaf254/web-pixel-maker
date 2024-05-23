@@ -1,4 +1,6 @@
 import WebPixelRendererConfig from './WebPixelRendererConfig';
+import renderShader from '../../shaders/render.wgsl?raw';
+import computeShader from '../../shaders/compute.wgsl?raw';
 
 class WebPixelRenderer {
   context: GPUCanvasContext;
@@ -70,41 +72,7 @@ class WebPixelRenderer {
     texture: GPUTexture
   } {
     const renderShaderModule = this.device.createShaderModule({
-      code: `
-        struct VertexOut {
-          @builtin(position) position : vec4f,
-          @location(0) uvs : vec2f,
-        }
-
-        @vertex
-        fn vertex_main(@location(0) position: vec4f, @location(1) uvs: vec2f) -> VertexOut
-        {
-          var output : VertexOut;
-          output.position = position;
-          output.uvs = uvs;
-          return output;
-        }
-
-        @group(0) @binding(0) var sam: sampler;
-        @group(0) @binding(1) var tex: texture_2d<f32>;
-        @group(0) @binding(2) var<uniform> color: vec4f;
-        @group(0) @binding(3) var<uniform> pos: vec2f;
-
-        @fragment
-        fn fragment_main(fragData: VertexOut) -> @location(0) vec4f
-        {
-          var dim: vec2<u32> = textureDimensions(tex);
-          var pixelSize: vec2f = vec2f(1) / vec2f(dim);
-          var posFloor: vec2f = floor(pos * vec2f(dim)) / vec2f(dim);
-          var posCeil: vec2f = floor(pos * vec2f(dim) + 1) / vec2f(dim);
-          var col = textureSample(tex, sam, fragData.uvs);
-          if (fragData.uvs.x >= posFloor.x && fragData.uvs.x < posCeil.x
-            && fragData.uvs.y >= posFloor.y && fragData.uvs.y < posCeil.y) {
-            col = color;
-          }
-          return col;
-        }
-      `,
+      code: renderShader,
     });
 
     const texture = this.device.createTexture({
@@ -238,30 +206,7 @@ class WebPixelRenderer {
     positionsBuffer: GPUBuffer
   } {
     const computeShaderModule = this.device.createShaderModule({
-      code: `
-        @group(0) @binding(0) var tex: texture_storage_2d<rgba8unorm, write>;
-        @group(0) @binding(1) var<uniform> color: vec4f;
-        @group(0) @binding(2) var<storage, read> positions: array<vec2f>;
-
-        @compute @workgroup_size(10)
-        fn compute_main(@builtin(workgroup_id) ids: vec3<u32>)
-        {
-          var pos_index: u32 = ids.x;
-          var pos: vec2f = positions[pos_index];
-          var dim: vec2<u32> = textureDimensions(tex);
-          var prev: vec2f = positions[pos_index];
-          if (pos_index > 0) {
-            prev = positions[pos_index - 1];
-          }
-          var dist: f32 = distance(prev, pos);
-          var pixelSize: vec2f = vec2f(1) / vec2f(dim);
-          textureStore(tex, vec2<u32>(vec2f(dim) * pos), color);
-          for (var index: f32 = 0; index < dist; index += pixelSize.x) {
-            var texel: vec2<u32> = vec2<u32>(vec2f(dim) * mix(prev, pos, index / dist));
-            textureStore(tex, texel, color);
-          }
-        }
-      `,
+      code: computeShader,
     });
 
     const computeBindGroupLayout = this.device.createBindGroupLayout({
