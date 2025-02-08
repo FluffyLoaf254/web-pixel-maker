@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 import IconButton from './IconButton.vue';
 import SettingsMenu from './SettingsMenu.vue';
-import { Cog6ToothIcon } from '@heroicons/vue/24/solid';
 
 type Emits = {
   tutorial: []
