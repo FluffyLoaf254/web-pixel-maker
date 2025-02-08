@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import IconButton from './IconButton.vue';
 import SettingsMenu from './SettingsMenu.vue';
+import { Cog6ToothIcon } from '@heroicons/vue/24/solid';
 
 type Emits = {
   tutorial: []
@@ -19,7 +20,7 @@ const settingsOpen = ref(false);
     </h1>
     <div class="flex gap-4 items-center">
       <icon-button @click="settingsOpen = !settingsOpen" label="Guided Tutorial">
-        <cog-6-tooth-icon class="w-5 h-5" />
+        <cog6-tooth-icon class="w-5 h-5" />
       </icon-button>
       <div class="relative">
         <settings-menu v-if="settingsOpen" @tutorial="$emit('tutorial')" @mouseleave="settingsOpen = false" @focusout="settingsOpen = false" />
